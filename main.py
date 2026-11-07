@@ -1,5 +1,9 @@
 from enum import Enum
 from random import randrange
+import os
+
+def clear():
+    os.system('cls' if os.name=='nt' else 'clear')
 
 class Field(Enum):
     EMPTY = 1
@@ -33,3 +37,19 @@ class Snake:
 
     def set_field(self, x: int, y: int, value: Field):
         self.field[y][x] = value
+
+    def display(self):
+        clear()
+        for y in range(self.height):
+            for x in range(self.width):
+                match self.get_field(x, y):
+                    case Field.EMPTY:
+                        print("⬜", end="")
+                    case Field.BODY:
+                        print("🟩", end="")
+                    case Field.APPLE:
+                        print("🟥", end="")
+            print()
+
+snake = Snake(5, 5)
+snake.display()
