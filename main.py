@@ -10,6 +10,12 @@ class Field(Enum):
     BODY = 2
     APPLE = 3
 
+class Direction(Enum):
+    UP = 1
+    RIGHT = 2
+    DOWN = 3
+    LEFT = 4
+
 class Snake:
     def __init__(self, width: int, height: int):
         self.width = width
@@ -32,11 +38,18 @@ class Snake:
         self.set_field(apple_x, apple_y, Field.APPLE)
         self.set_field(snake_x, snake_y, Field.BODY)
 
-    def get_field(self, x: int, y:int):
+        self.direction = Direction(randrange(1, 5))
+        self.position_x = snake_x
+        self.position_y = snake_y
+
+    def get_field(self, x: int, y: int) -> Field:
         return self.field[y][x]
 
     def set_field(self, x: int, y: int, value: Field):
         self.field[y][x] = value
+
+    def is_position_valid(self, x: int, y: int) -> bool:
+        return 0 <= x < self.width and 0 <= y < self.height
 
     def display(self):
         clear()
@@ -50,6 +63,29 @@ class Snake:
                     case Field.APPLE:
                         print("🟥", end="")
             print()
+
+    def move(self, grow: bool) -> bool:
+        new_x = self.position_x
+        new_y = self.position_y
+        match self.direction:
+            case Direction.UP:
+                new_y -= 1
+            case Direction.RIGHT:
+                new_x += 1
+            case Direction.DOWN:
+                new_y += 1
+            case Direction.LEFT:
+                new_x -= 1
+
+        if not self.is_position_valid(new_x, new_y):
+            return False
+
+        self.set_field(new_x, new_y, Field.BODY)
+
+        # kovi oran Queue folytatjuk
+
+        return True
+
 
 snake = Snake(5, 5)
 snake.display()
