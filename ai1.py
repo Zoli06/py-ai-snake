@@ -51,4 +51,4 @@ if __name__ == "__main__":
             break
         game.display()
 
-        print("Game over! Length: " + str(len(game.snake) - 1))
+    print("Game over! Length: " + str(len(game.snake) - 1))
