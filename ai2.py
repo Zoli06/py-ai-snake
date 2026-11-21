@@ -4,7 +4,24 @@ import time
 from sklearn.tree import DecisionTreeClassifier, export_text
 
 from ai1 import is_safe, distance, choose_direction
-from main import Snake, Direction
+from main import Snake, Direction, Position
+
+def count_room(game: Snake, start: Position):
+    if not is_safe(game, start):
+        return 0
+
+    reached = [(start.x, start.y)]
+    to_visit = [start]
+
+    while len(to_visit) > 0:
+        field = to_visit.pop()
+        for direction in Direction:
+            neighbor = field.neighbor(direction)
+            if is_safe(game, neighbor) and (neighbor.x, neighbor.y) not in reached:
+                reached.append((neighbor.x, neighbor.y))
+                to_visit.append(neighbor)
+
+    return len(reached)
 
 def inspect_direction(game: Snake, direction: Direction):
     head = game.snake[0]
@@ -13,7 +30,9 @@ def inspect_direction(game: Snake, direction: Direction):
     dead = 0 if is_safe(game, new_head) else 1
     closer = 1 if distance(new_head, game.apple) < distance(head, game.apple) else 0
 
-    return [dead, closer]
+    room = 1 if count_room(game, new_head) >= len(game.snake) else 0
+
+    return [dead, closer, room]
 
 examples = []
 results = []
@@ -51,7 +70,8 @@ model = DecisionTreeClassifier()
 model.fit(examples, results)
 
 print("A kovetkezoket tanultam: ")
-print(export_text(model, feature_names=["dead", "closer"]))
+print(export_text(model, feature_names=["dead", "closer", "room"]))
+input("Enter a jatekhoz")
 
 def choose_direction(game: Snake):
     best_direction = Direction.UP
