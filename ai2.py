@@ -1,5 +1,7 @@
 import random
 
+from sklearn.tree import DecisionTreeClassifier, export_text
+
 from ai1 import is_safe, distance
 from main import Snake, Direction
 
@@ -40,3 +42,9 @@ for i in range(5000):
 
     examples.append(inspection_result)
     results.append(result)
+
+model = DecisionTreeClassifier()
+model.fit(examples, results)
+
+print("A kovetkezoket tanultam: ")
+print(export_text(model))

@@ -135,7 +135,7 @@ class Snake:
     def play(self):
         while True:
             new_direction = self.direction
-            t_end = time.time() + 1
+            t_end = time.time() + .5
             while time.time() < t_end:
                 if keyboard.is_pressed("up arrow"):
                     new_direction = Direction.UP
