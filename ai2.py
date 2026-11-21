@@ -30,12 +30,13 @@ def inspect_direction(game: Snake, direction: Direction):
     dead = 0 if is_safe(game, new_head) else 1
     closer = 1 if distance(new_head, game.apple) < distance(head, game.apple) else 0
 
-    room = 1 if count_room(game, new_head) >= len(game.snake) else 0
+    room = 1 if count_room(game, new_head) >= len(game.snake)+2 else 0
 
     return [dead, closer, room]
 
 examples = []
 results = []
+game_start = 0
 
 game = Snake(10, 10)
 for i in range(5000):
@@ -55,7 +56,6 @@ for i in range(5000):
 
     if not alive:
         result = 0
-        game = Snake(10, 10)
     elif distance(game.snake[0], game.apple) < distance_before:
         result = 2
     elif len(game.snake) > length_before:
@@ -65,6 +65,12 @@ for i in range(5000):
 
     examples.append(inspection_result)
     results.append(result)
+
+    if not alive:
+        for j in range(max(game_start, len(results) - 10), len(results)):
+            results[j] = 0
+        game = Snake(10, 10)
+        game_start = len(results)
 
 model = DecisionTreeClassifier()
 model.fit(examples, results)
