@@ -1,8 +1,9 @@
 import random
+import time
 
 from sklearn.tree import DecisionTreeClassifier, export_text
 
-from ai1 import is_safe, distance
+from ai1 import is_safe, distance, choose_direction
 from main import Snake, Direction
 
 def inspect_direction(game: Snake, direction: Direction):
@@ -19,9 +20,12 @@ results = []
 
 game = Snake(10, 10)
 for i in range(5000):
-    direction = random.choice(list(Direction))
-    while not game.is_turn_possible(direction):
+    if random.random() < 0.3:
         direction = random.choice(list(Direction))
+        while not game.is_turn_possible(direction):
+            direction = random.choice(list(Direction))
+    else:
+        direction = choose_direction(game)
 
     inspection_result = inspect_direction(game, direction)
 
@@ -47,4 +51,29 @@ model = DecisionTreeClassifier()
 model.fit(examples, results)
 
 print("A kovetkezoket tanultam: ")
-print(export_text(model))
+print(export_text(model, feature_names=["dead", "closer"]))
+
+def choose_direction(game: Snake):
+    best_direction = Direction.UP
+    best_score = -1
+
+    for direction in Direction:
+        if not game.is_turn_possible(direction):
+            continue
+
+        inspection_result = inspect_direction(game, direction)
+        score = model.predict([inspection_result])[0]
+        if score > best_score:
+            best_score = score
+            best_direction = direction
+
+    return best_direction
+
+game = Snake(10, 10)
+while True:
+    time.sleep(0.2)
+    if not game.step(choose_direction(game)):
+        break
+    game.display()
+
+print("Game over! Length: ", len(game.snake) - 1)
